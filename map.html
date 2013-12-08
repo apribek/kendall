@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html ng-app="geoApp">
+<head>
+    <!-- URL:http://plnkr.co/edit/THpXENXc9fdTjCmW2uYm -->
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>GeoWISE</title>
+    <!--link rel="stylesheet" href="https://d10ajoocuyu32n.cloudfront.net/mobile/1.3.1/jquery.mobile-1.3.1.min.css"-->
+
+    <!-- jQuery and jQuery Mobile -->
+    <style>
+        html, body, #map-canvas {
+            height: 100%;
+            margin: 0px;
+            padding: 0px
+        }
+        #panel {
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            margin-left: -180px;
+            z-index: 5;
+            background-color: #fff;
+            padding: 1px;
+            border: 1px solid #999;
+            opacity: 0.5;
+        }    </style>
+    <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+    <script src="lib/angular/angular.js"></script>
+    <script src="js/controller.js"></script>
+    <script src="js/services.js"></script>
+
+    <!--script src="https://d10ajoocuyu32n.cloudfront.net/jquery-1.9.1.min.js"></script-->
+    <!--script src="https://d10ajoocuyu32n.cloudfront.net/mobile/1.3.1/jquery.mobile-1.3.1.min.js"></script-->
+    <!--script src="https://d10ajoocuyu32n.cloudfront.net/codiqa.ext.js"></script-->
+</head>
+<body ng-controller="mapTestCtrl" >
+<div id="panel"><button id="top" ng-click='upClicked()'>UP</button></div>
+<div id="map-canvas"></div>
+<div id="list">
+    <div ng-repeat="m in messages">
+        <span ng-if="m.msg">{{m.msg}} - {{ audienceList[m.audience].label }}</span>
+    </div>
+</div>
+</body>
+</html>

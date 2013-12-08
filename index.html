@@ -1,0 +1,12 @@
+<div data-role='content'>
+    <div data-role='fieldcontain'>
+        <label for='textarea1'>Message</label>
+        <textarea name='' id='textarea1' placeholder='' data-mini='true' ng-model='message.msg'></textarea>
+    </div>
+    <div data-role='fieldcontain'>
+        <fieldset data-role='controlgroup' data-type='vertical'>
+            <legend>For</legend>
+            <label ng-repeat="a in audienceList" for="{{a.key}}">{{a.label}}<input id='r-{{a.key}}' name='audience' type='radio' ng-model='message.audience' ng-value='a.key'/></label>
+        </fieldset>
+    </div>
+</div>
