@@ -2,7 +2,7 @@
  * Created by adam on 11/22/13.
  */
 
-var geoApp = angular.module('geoApp', ['geoServices']);
+var geoApp = angular.module('geoApp', ['geoServices', 'taskService', 'gTasks']);
 
 geoApp.constant('audienceList',
     {
@@ -12,17 +12,38 @@ geoApp.constant('audienceList',
     }
 );
 
-geoApp.controller('mapTestCtrl', ['$scope', 'gMap', 'audienceList', function ($scope, map, al) {
+geoApp.controller('mapTestCtrl', ['$scope', 'gMap', 'audienceList', 'taskService', 'gTasks', '$log', function ($scope, map, al, taskService, gTasks, $log) {
     $scope.audienceList = al;
 
     $scope.message = "";
-    $scope.messages = [];
+    $scope.messages = taskService.listTasks;
+
+    map.init($scope);
+    gTasks.init();
+
+    gTasks.checkAccess().then(function(a) {
+        $scope.hideAuthorizationPanel = a;
+    });
+
+    $log.debug("v: " + $scope.hideAuthorizationPanel);
 
     $scope.upClicked = function() {
         map.moveActiveMarker(0.001, 0);
     };
 
-    map.init($scope);
+    $scope.authorize = function() {
+        gTasks.allowAccess().then(function(r) {
+            $scope.hideAuthorizationPanel = r;
+        }, function(error) {
+            // bummer
+        });
+        return false;
+    }
+
+    $scope.doNotAuthorize = function() {
+        $scope.hideAuthorizationPanel = true;
+        gTasks.denyAccess();
+    }
 }]);
 
 geoApp.directive('infoWindow', function() {

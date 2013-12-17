@@ -10,13 +10,13 @@
     <!-- jQuery and jQuery Mobile -->
     <style>
         html, body, #map-canvas {
-            height: 100%;
+            height: 90%;
             margin: 0px;
             padding: 0px
         }
         #panel {
             position: absolute;
-            top: 5px;
+            top: 45%;
             left: 50%;
             margin-left: -180px;
             z-index: 5;
@@ -24,22 +24,27 @@
             padding: 1px;
             border: 1px solid #999;
             opacity: 0.5;
-        }    </style>
+        }
+    </style>
+    <script src="https://apis.google.com/js/client.js"></script>
     <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
     <script src="lib/angular/angular.js"></script>
+    <script src="lib/angular/angular-resource.js"></script>
+    <script src="js/tasks.js"></script>
     <script src="js/controller.js"></script>
     <script src="js/services.js"></script>
-
-    <!--script src="https://d10ajoocuyu32n.cloudfront.net/jquery-1.9.1.min.js"></script-->
-    <!--script src="https://d10ajoocuyu32n.cloudfront.net/mobile/1.3.1/jquery.mobile-1.3.1.min.js"></script-->
-    <!--script src="https://d10ajoocuyu32n.cloudfront.net/codiqa.ext.js"></script-->
 </head>
 <body ng-controller="mapTestCtrl" >
-<div id="panel"><button id="top" ng-click='upClicked()'>UP</button></div>
+<div id="panel" ng-hide="hideAuthorizationPanel">
+    <!--button id="top" ng-click='upClicked()'>UP</button-->
+    GeoWise can add your messages as tasks to your Google account
+    <button id="authorize" ng-click="authorize()">Authorize</button>
+    <button id="authorize" ng-click="doNotAuthorize()">Not interested</button>
+</div>
 <div id="map-canvas"></div>
 <div id="list">
-    <div ng-repeat="m in messages">
-        <span ng-if="m.msg">{{m.msg}} - {{ audienceList[m.audience].label }}</span>
+    <div ng-repeat="m in messages()">
+        <span ng-if="m">{{m.msg}} - {{ audienceList[m.audience].label }}</span>
     </div>
 </div>
 </body>

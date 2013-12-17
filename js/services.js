@@ -2,11 +2,10 @@
  * Created by adam on 11/23/13.
  */
 
-var geoServices = angular.module('geoServices', []);
+var geoServices = angular.module('geoServices', ['taskService']);
 
-geoServices.factory('gMap', function($compile) {
+geoServices.factory('gMap', function($compile, taskService) {
     var markerCounter = 0;
-    var messages = [];
     var activeMarker = null;
     var scope = null;
 
@@ -16,7 +15,7 @@ geoServices.factory('gMap', function($compile) {
         marker.iid = markerCounter;
         marker.title = 'Marker ' + markerCounter;
 
-        pushMessage({ msg: marker.title, audience: 'myself' });
+        taskService.addTask(marker.iid, marker.title, /*location*/ null)
         setActiveMarker(marker);
     };
 
@@ -27,17 +26,15 @@ geoServices.factory('gMap', function($compile) {
         activeMarker = newMarker;
         activeMarker.setIcon('http://maps.google.com/mapfiles/ms/micons/yellow-dot.png');
 
-        scope.message = messages[newMarker.iid - 1];
+        // >>> This does not belong here
+        scope.message = taskService.getTask(newMarker.iid);
         scope.$apply();
+        // <<<
     };
 
     var removeMarker =  function(marker) {
         marker.setMap(null);
-        messages[marker.iid - 1] = marker.iid;  // cannot be set to null because ng-repeat will error if two or more of the same key (null) are found
-    };
-
-    var pushMessage = function(message) {
-        messages.push(message);
+        taskService.deleteTask(marker.iid - 1);
     };
 
     return {
@@ -49,8 +46,6 @@ geoServices.factory('gMap', function($compile) {
         },
         init: function(_scope) {
             scope = _scope;
-
-            scope.messages = messages;
 
             var map = null;
             var ifmsgTemplate = $compile("<div info-window></div>")(scope);
