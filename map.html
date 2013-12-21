@@ -26,13 +26,27 @@
             opacity: 0.5;
         }
     </style>
-    <script src="https://apis.google.com/js/client.js"></script>
     <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
     <script src="lib/angular/angular.js"></script>
     <script src="lib/angular/angular-resource.js"></script>
+    <script src="js/util.js"></script>
+    <script src="js/oauth.js"></script>
     <script src="js/tasks.js"></script>
     <script src="js/controller.js"></script>
     <script src="js/services.js"></script>
+    <script>
+        function gapiClientLoaded()
+        {
+            gapi.client.setApiKey('AIzaSyClUbYr_xv2K9eGm0ePw2fmvJ11W1XaBK4');
+            gapi.client.load('tasks', 'v1', function() {
+                angular.element(document.querySelector('[ng-controller]'))
+                        .injector()
+                        .get('oauth')
+                        .gapiClientLoaded();
+            });
+        }
+    </script>
+    <script src="https://apis.google.com/js/client.js?onload=gapiClientLoaded"></script>
 </head>
 <body ng-controller="mapTestCtrl" >
 <div id="panel" ng-hide="hideAuthorizationPanel">

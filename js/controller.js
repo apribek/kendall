@@ -2,7 +2,7 @@
  * Created by adam on 11/22/13.
  */
 
-var geoApp = angular.module('geoApp', ['geoServices', 'taskService', 'gTasks']);
+var geoApp = angular.module('geoApp', ['geoServices', 'taskService', 'gTasks', 'oauth', 'util']);
 
 geoApp.constant('audienceList',
     {
@@ -12,27 +12,33 @@ geoApp.constant('audienceList',
     }
 );
 
-geoApp.controller('mapTestCtrl', ['$scope', 'gMap', 'audienceList', 'taskService', 'gTasks', '$log', function ($scope, map, al, taskService, gTasks, $log) {
-    $scope.audienceList = al;
+geoApp.controller('mapTestCtrl', ['$scope', 'gMap', 'audienceList', 'taskService', 'gTasks', 'oauth', 'util', '$log', function ($scope, map, al, taskService, gTasks, oauth, util, $log) {
+    var clientId = '559380446604-rvvui7svj0s98hontlo974fkrtnnms99.apps.googleusercontent.com',
+        scope = ['https://www.googleapis.com/auth/tasks', 'https://www.googleapis.com/auth/tasks.readonly'];
 
-    $scope.message = "";
+    oauth.init(clientId, scope);
+
+    $scope.audienceList = al;
+    $scope.message = null;
     $scope.messages = taskService.listTasks;
 
     map.init($scope);
-    gTasks.init();
 
-    gTasks.checkAccess().then(function(a) {
+    $scope.change = util.debounce(function() {
+            taskService.updateTask($scope.message);
+        }, 500);
+
+    oauth.checkAccess().then(function(a) {
         $scope.hideAuthorizationPanel = a;
+        $log.debug("v: " + a);
     });
-
-    $log.debug("v: " + $scope.hideAuthorizationPanel);
 
     $scope.upClicked = function() {
         map.moveActiveMarker(0.001, 0);
     };
 
     $scope.authorize = function() {
-        gTasks.allowAccess().then(function(r) {
+        oauth.allowAccess().then(function(r) {
             $scope.hideAuthorizationPanel = r;
         }, function(error) {
             // bummer
@@ -42,7 +48,7 @@ geoApp.controller('mapTestCtrl', ['$scope', 'gMap', 'audienceList', 'taskService
 
     $scope.doNotAuthorize = function() {
         $scope.hideAuthorizationPanel = true;
-        gTasks.denyAccess();
+        oauth.denyAccess();
     }
 }]);
 

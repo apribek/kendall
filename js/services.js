@@ -4,7 +4,9 @@
 
 var geoServices = angular.module('geoServices', ['taskService']);
 
-geoServices.factory('gMap', function($compile, taskService) {
+geoServices.factory('gMap', ['$compile', 'taskService', function($compile, taskService) {
+    'use strict';
+
     var markerCounter = 0;
     var activeMarker = null;
     var scope = null;
@@ -15,7 +17,7 @@ geoServices.factory('gMap', function($compile, taskService) {
         marker.iid = markerCounter;
         marker.title = 'Marker ' + markerCounter;
 
-        taskService.addTask(marker.iid, marker.title, /*location*/ null)
+        taskService.addTask(marker.iid, marker.title, marker.position)
         setActiveMarker(marker);
     };
 
@@ -113,4 +115,4 @@ geoServices.factory('gMap', function($compile, taskService) {
             });
         }
     }
-});
+}]);
