@@ -18,15 +18,9 @@ oauth.factory('oauth', ['$log', '$q', function ($log, $q) {
         var deferred = $q.defer();
 
         if(! accessDenied) {
-            $log.debug("access is not denied");
-
             if(! authorized) {
-                $log.debug("not yet authorized");
-
                 gcLoaded.promise.then(
                     function() {
-                        $log.debug("about to check access");
-
                         gapi.auth.authorize({ client_id : clientId, immediate : background, scope : scope },
                             function(resp) {
                                 $log.debug(resp);
@@ -46,12 +40,10 @@ oauth.factory('oauth', ['$log', '$q', function ($log, $q) {
                 );
             }
             else {
-                $log.debug("authorized");
                 deferred.resolve(authorized);
             }
         }
         else {
-            $log.debug("access denied");
             deferred.reject("Access denied")
         }
 
@@ -65,12 +57,10 @@ oauth.factory('oauth', ['$log', '$q', function ($log, $q) {
         },
 
         gapiClientLoaded : function() {     // does not really belong here
-            $log.debug("gapi.client loaded");
             gcLoaded.resolve(true);
         },
 
         checkAccess : function() {
-            $log.debug("checking access");
             return checkAccessInternal(true);
         },
 

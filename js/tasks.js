@@ -2,9 +2,10 @@
  * Created by adam on 12/15/13.
  */
 
-function Task(title, location) {
-    this.id = null;
-    this.msg = this.title = title;
+function Task(title, location, id) {
+    this.id = id;
+    this.msg = title;
+    this.title = title;
     this.location = location;
 }
 
@@ -18,7 +19,11 @@ Task.prototype.asResource = function() {
     }
 }
 
-var gTasks = angular.module('gTasks', ['oauth']).factory('gTasks', ['$log', '$q', 'oauth', function($log, $q, oauth) {
+Task.prototype.toString = function() {
+    JSON.stringify(this);
+}
+
+var gTasks = angular.module('gTasks', ['oauth']).factory('gTasks', ['$log', '$q', 'oauth', 'util', function($log, $q, oauth, util) {
     'use strict';
 
     var taskListId = null;
@@ -87,11 +92,38 @@ var gTasks = angular.module('gTasks', ['oauth']).factory('gTasks', ['$log', '$q'
             );
 
             return task;
+        },
+
+        loadTasks : function() {
+            var deferred = $q.defer();
+            var taskList = [];
+
+            loadTaskLists().then(
+                function() {
+                    gapi.client.tasks.tasks.list({
+                        tasklist: taskListId
+                    }).execute(function(resp){
+                            if(resp.items) {
+                                taskList = resp.items.filter(function(e){
+                                    return e.notes && e.notes.indexOf("-- @ --") != -1;
+                                }).map(function(fe) {
+                                    return new Task(fe.notes.substr(0, fe.notes.indexOf("\r\n\r\n-- @ --\r\n")), util.parseLocation(fe.notes), fe.id);
+                                });
+                            }
+                            deferred.resolve(taskList);
+                        });
+                },
+                function(error) {
+                    deferred.reject("Error loading tasks");
+                }
+            );
+
+            return deferred.promise;
         }
     }
 }]);
 
-var taskService = angular.module('taskService', ['gTasks']).factory('taskService', ['$log', 'gTasks', function ($log, gTasks) {
+var taskService = angular.module('taskService', []).factory('taskService', ['$injector', '$log', 'gTasks', function ($injector, $log, gTasks) {
     var tasks = [];
 
     return {
@@ -109,6 +141,13 @@ var taskService = angular.module('taskService', ['gTasks']).factory('taskService
 
         getTask : function (mid) {
             return tasks[mid];
+        },
+
+        loadTasks : function(callback) {
+            gTasks.loadTasks().then(function(list){
+                tasks = list;
+                callback(list);
+            });
         },
 
         listTasks : function() {

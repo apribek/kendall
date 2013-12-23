@@ -24,6 +24,12 @@ geoApp.controller('mapTestCtrl', ['$scope', 'gMap', 'audienceList', 'taskService
 
     map.init($scope);
 
+    taskService.loadTasks(function(tl) {
+        tl.forEach(function(t){
+            map.addNewMarker(t.location, t.title);
+         });
+    });
+
     $scope.change = util.debounce(function() {
             taskService.updateTask($scope.message);
         }, 500);
